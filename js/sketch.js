@@ -57,7 +57,7 @@ function setup() {
   reseedButton = select('#reseedButton');
   reseedButton.mousePressed(reseedStars);
 
-  // Jim
+  //Jim 
   for (let i = 0; i < 10; i++){
     constellationStars[i] = new constellationStar();
   }
@@ -92,16 +92,11 @@ function draw() {
     reseedNeeded = false; // Reset the flag
   }
 
-  // Draw  background stars
+  // Draw stars
   fill(255); // Set fill color to white
   noStroke(); // Remove stroke
   for (let i = 0; i < backgroundStars.length; i++) {
     backgroundStars[i].show()
-  }
-
-  // Draw constellation stars - Jim
-  for (let i = 0; i < constellationStars.length; i++) {
-    constellationStars[i].show();
   }
 
   // Draw lines between selected stars
@@ -111,10 +106,12 @@ function draw() {
     line(selectedStars[i].x, selectedStars[i].y, selectedStars[i + 1].x, selectedStars[i + 1].y);
   }
 
-  
+  // Draw constellation stars - Jim
+  for (let i = 0; i < constellationStars.length; i++) {
+    constellationStars[i].show();
+  }
 }
 
-// class for the stars twinkling in the background - Jim
 class backgroundStar{
   constructor(){
     this.x = random(width);
@@ -131,7 +128,6 @@ class backgroundStar{
   }
 }
 
-// class for the big, glowing connectable stars - Jim
 class constellationStar{
   constructor(){
     this.x = random(width); // x position
@@ -179,7 +175,6 @@ class constellationStar{
 // mousePressed() function is called once after every time a mouse button is pressed
 function mousePressed() {
   // Check if a star was clicked
-  // it's kinda glitchy right now - Jim
   for (let i = 0; i < constellationStars.length; i++) {
     let d = dist(mouseX, mouseY, constellationStars[i].x, constellationStars[i].y);
     if (d < starRadius) {
