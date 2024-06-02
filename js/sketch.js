@@ -15,6 +15,7 @@ var centerHorz, centerVert;
 
 const starRadius = 2;
 let stars = []; // Array to store star positions
+let selectedStars = []; // Array to store selected star positions for drawing lines
 let reseedButton;
 let reseedNeeded = true;
 
@@ -40,7 +41,7 @@ function resizeScreen() {
 function setup() {
   // place our canvas, making it fit our container
   canvasContainer = $("#canvas-container");
-  canvas = createCanvas(1000, 1000);
+  canvas = createCanvas(1000, 500);
   canvas.parent("canvas-container");
 
   // create an instance of the class
@@ -58,6 +59,7 @@ function setup() {
 
 function reseedStars() {
   reseedNeeded = true;
+  selectedStars = []; // Clear selected stars on reseed
 }
 
 // draw() function is called repeatedly, it's the main animation loop
@@ -86,9 +88,23 @@ function draw() {
   for (let i = 0; i < stars.length; i++) {
     ellipse(stars[i].x, stars[i].y, starRadius * 2, starRadius * 2); // Draw circle with diameter 4 (radius 2)
   }
+
+  // Draw lines between selected stars
+  stroke(255); // Set stroke color to white
+  strokeWeight(2); // Set line thickness
+  for (let i = 0; i < selectedStars.length - 1; i++) {
+    line(selectedStars[i].x, selectedStars[i].y, selectedStars[i + 1].x, selectedStars[i + 1].y);
+  }
 }
 
 // mousePressed() function is called once after every time a mouse button is pressed
 function mousePressed() {
-    // code to run when mouse is pressed
+  // Check if a star was clicked
+  for (let i = 0; i < stars.length; i++) {
+    let d = dist(mouseX, mouseY, stars[i].x, stars[i].y);
+    if (d < starRadius) {
+      selectedStars.push(stars[i]);
+      break;
+    }
+  }
 }
