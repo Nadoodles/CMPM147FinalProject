@@ -177,8 +177,8 @@ class constellationStar{
 
     this.x = random(width); // x position
     this.y = random(height); // y position
-    this.size = random(4  ,6) * 1.5; // random size for ellipse
-    this.line_resolution = 40; // resolution for the cross lines
+    this.size = random(9, 10) ; // random size for ellipse
+    //this.line_resolution = 40; // resolution for the cross lines
     this.opacity = 255;
     this.vertices = [];
 
@@ -186,8 +186,17 @@ class constellationStar{
 
   show(){
 
-    // star circle
-    ellipse(this.x, this.y, this.size, this.size);
+    // star shape
+    beginShape()
+    vertex(this.x, this.y-this.size) // top point
+    vertex(this.x - this.size/5, this.y - this.size/4)
+    vertex(this.x - this.size, this.y) // left point
+    vertex(this.x - this.size/5, this.y + this.size/4)
+    vertex(this.x, this.y + this.size) // bottom point
+    vertex(this.x + this.size/5, this.y + this.size/4)
+    vertex(this.x + this.size, this.y) // right point
+    vertex(this.x + this.size/5, this.y - this.size/4)
+    endShape(CLOSE)
 
     drawingContext.shadowBlur = 32;
     drawingContext.shadowColor = color(173, 216, 230);
@@ -327,33 +336,4 @@ function mouseReleased() {
 
 }
 
-/* wacky glow
-// this looks cool but it slows down the code like heyo
-    // star lines
-    // it's scuffed but basically it increases the line thickeness as it gets closer to the ellipse using lerp
-    let prev_x_left = this.x-10;
-    let prev_x_right = this.x+10;
-    let prev_y_up = this.y-10;
-    let prev_y_down = this.y+10;
-    for (let i = 0; i < this.line_resolution; i++){
-      let current_x_left = lerp(this.x-10, this.x, i / this.line_resolution);
-      let current_x_right = lerp(this.x+10, this.x, i / this.line_resolution);
-      let current_y_up = lerp(this.y-10, this.y, i / this.line_resolution)
-      let current_y_down = lerp(this.y+10, this.y, i / this.line_resolution)
-      push()
-      strokeWeight(lerp(1, this.size, i/this.line_resolution));
-      line(prev_x_left, this.y, current_x_left, this.y);
-      line(prev_x_right, this.y, current_x_right, this.y);
-      line(this.x, prev_y_up, this.x, current_y_up);
-      line(this.x, prev_y_down, this.x, current_y_down);
-      pop()
-      prev_x_left = current_x_left;
-      prev_x_right = current_x_right;
-      prev_y_up = current_y_up
-      prev_y_down = current_y_down
-    }
-
-    // glow
-    // wack i'll mess around more with it later, or someone else can
-*/
 
