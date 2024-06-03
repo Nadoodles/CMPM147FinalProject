@@ -17,12 +17,17 @@ const starRadius = 10;
 let backgroundStars = []; // Array to store star positions
 let constellationStars = []; // Array to store consetallion star positions
 let selectedStars = []; // Array to store selected star positions for drawing lines
+let sparks = [];
 let reseedButton;
 let reseedNeeded = true;
 
 let connections = [];
 let currStar;
 let starSelected;
+
+let fadeOutSpeed = 0.1;
+let sparkSpeed = 0.3;
+let sparkSize = 5;
 
 class MyClass {
     constructor(param1, param2) {
@@ -62,7 +67,7 @@ function setup() {
   reseedButton.mousePressed(reseedStars);
 
   //Jim 
-  for (let i = 0; i < 10; i++){
+  for (let i = 0; i < 20; i++){
     constellationStars[i] = new constellationStar();
   }
 }
@@ -89,7 +94,7 @@ function draw() {
     }
 
     // generate constellation stars
-    while (constellationStars.length < 10){
+    while (constellationStars.length < 20){
       constellationStars.push(new constellationStar()); 
     }
 
@@ -99,6 +104,7 @@ function draw() {
   // Draw stars
   fill(255); // Set fill color to white
   noStroke(); // Remove stroke
+
   for (let i = 0; i < backgroundStars.length; i++) {
     backgroundStars[i].show()
   }
@@ -106,8 +112,13 @@ function draw() {
   // Draw lines between selected stars
   stroke(255); // Set stroke color to white
   strokeWeight(2); // Set line thickness
+
   for (let i = 0; i < connections.length; i++) {
-    line(connections[i][0], connections[i][1], connections[i][2], connections[i][3]);
+    line(connections[i][0].x, connections[i][0].y, connections[i][1].x, connections[i][1].y);
+  }
+
+  if (starSelected) {
+    line(mouseX, mouseY, currStar.x, currStar.y);
   }
 
   // Draw constellation stars - Jim
@@ -115,43 +126,202 @@ function draw() {
     constellationStars[i].show();
   }
 
-  if (starSelected) {
+  // Draw feedback
+  for (let i = 0; i < constellationStars.length; i++) {
 
-    line(mouseX, mouseY, currStar.x, currStar.y);
+    let d = dist(mouseX, mouseY, constellationStars[i].x, constellationStars[i].y);   // get distance to star
+
+    if (d < starRadius) {
+      
+      constellationStars[i].resetGlow();
+      break;
+
+    }
 
   }
+
+  for (let i = 0; i < sparks.length; i++) {
+    sparks[i].show();
+  }
+
 }
 
 class backgroundStar{
+
   constructor(){
+
     this.x = random(width);
     this.y = random(height);
     this.size = random(1, 3);
     this.timer = random(0, 4); // twinkle timer
+
   }
 
   //https://editor.p5js.org/robert0504/sketches/srSzgJcCS <-- credits to the twinkle formula
   show(){
+
     fill(255,255,255,(0.5 * (Math.sin(this.timer)) + 0.5) * 255)
     ellipse(this.x,this.y, this.size, this.size);
     this.timer+=deltaTime/1000
+
   }
+
 }
 
 class constellationStar{
+
   constructor(){
+
     this.x = random(width); // x position
     this.y = random(height); // y position
-    this.size = random(4  ,6); // random size for ellipse
+    this.size = random(4  ,6) * 1.5; // random size for ellipse
     this.line_resolution = 40; // resolution for the cross lines
+    this.opacity = 255;
+    this.vertices = [];
+
   }
 
   show(){
+
     // star circle
     ellipse(this.x, this.y, this.size, this.size);
 
-    // this looks cool but it slows down the code like heyo
-    /*// star lines
+    drawingContext.shadowBlur = 32;
+    drawingContext.shadowColor = color(173, 216, 230);
+    ellipse(this.x, this.y, this.size/2, this.size/2);
+    noStroke();
+
+    fill(255, 255, 255, this.opacity);
+    this.opacity = lerp(this.opacity, 0, fadeOutSpeed);
+    ellipse(this.x, this.y, this.size * 5, this.size * 5);
+    fill(255);
+
+  }
+
+  resetGlow() {
+
+    this.opacity = 200;
+
+  }
+
+  twinkle(fromStar = null) {
+
+    this.resetGlow();
+    for (let i = 0; i < this.vertices.length; i++) {
+
+      if (fromStar != this.vertices[i]) {
+
+        sparks.push(new spark(this, this.vertices[i])); 
+
+      }
+
+    }
+
+  }
+
+}
+
+class spark {
+
+  constructor(fromStar, nextStar) {
+
+    this.pos = createVector(fromStar.x, fromStar.y);
+    console.log(this.pos.x, this.pos.y);
+    this.fromStar = fromStar;
+    this.nextStar = nextStar;
+
+  }
+
+  show() {
+
+    fill(255);
+    ellipse(this.pos.x, this.pos.y, sparkSize, sparkSize);
+    let direction = createVector(this.nextStar.x - this.pos.x, this.nextStar.y - this.pos.y);
+    direction = direction.normalize();
+    this.pos.x = this.pos.x + (direction.x * sparkSpeed * deltaTime);
+    this.pos.y = this.pos.y + (direction.y * sparkSpeed * deltaTime);
+
+    for (let i = 0; i < constellationStars.length; i++) {
+
+      let d = dist(this.pos.x, this.pos.y, constellationStars[i].x, constellationStars[i].y);   // get distance to star
+
+      if (d < starRadius) {
+        
+        if (constellationStars[i] == this.nextStar) {
+
+          constellationStars[i].twinkle(this.fromStar);
+          let index = sparks.indexOf(this);
+          sparks.splice(index, 1);
+
+        }
+
+      }
+
+    }    
+
+  }
+
+}
+
+function mousePressed() {
+
+  starSelected = false;
+
+  for (let i = 0; i < constellationStars.length; i++) {
+
+    let d = dist(mouseX, mouseY, constellationStars[i].x, constellationStars[i].y);   // get distance to star
+
+    if (d < starRadius) {
+
+      currStar = constellationStars[i];
+      starSelected = true;
+      break;
+
+    }
+
+  }
+
+}
+
+function mouseReleased() {
+
+  if (starSelected) {
+  
+    for (let i = 0; i < constellationStars.length; i++) {
+
+      let d = dist(mouseX, mouseY, constellationStars[i].x, constellationStars[i].y);   // get distance to star
+
+      if (d < starRadius) {
+        
+        if (constellationStars[i] == currStar) {
+
+          currStar.twinkle();
+          starSelected = false;
+          return;
+
+        } else {
+
+          connections.push([currStar, constellationStars[i]]);
+          currStar.vertices.push(constellationStars[i]);
+          constellationStars[i].vertices.push(currStar);
+          starSelected = false;
+          return;
+
+        }
+
+      }
+
+    }
+
+  }
+
+  starSelected = false;
+
+}
+
+/* wacky glow
+// this looks cool but it slows down the code like heyo
+    // star lines
     // it's scuffed but basically it increases the line thickeness as it gets closer to the ellipse using lerp
     let prev_x_left = this.x-10;
     let prev_x_right = this.x+10;
@@ -173,57 +343,9 @@ class constellationStar{
       prev_x_right = current_x_right;
       prev_y_up = current_y_up
       prev_y_down = current_y_down
-    }*/
+    }
 
     // glow
     // wack i'll mess around more with it later, or someone else can
-    drawingContext.shadowBlur = 32;
-    drawingContext.shadowColor = color(173, 216, 230);
-    ellipse(this.x, this.y, this.size/2, this.size/2);
-  }
-}
-
-// mousePressed() function is called once after every time a mouse button is pressed
-function mousePressed() {
-  // Check if a star was clicked
-
-  starSelected = false;
-
-  for (let i = 0; i < constellationStars.length; i++) {
-
-      let d = dist(mouseX, mouseY, constellationStars[i].x, constellationStars[i].y);   // get distance to star
-
-      if (d < starRadius) {
-          currStar = constellationStars[i];
-          starSelected = true;
-          console.log("clicked!");
-          break;
-      }
-  }
-}
-
-function mouseReleased() {
-
-  if (starSelected) {
-
-    console.log("scanning...");
-  
-    for (let i = 0; i < constellationStars.length; i++) {
-
-      let d = dist(mouseX, mouseY, constellationStars[i].x, constellationStars[i].y);   // get distance to star
-
-      if (d < starRadius && constellationStars[i] != currStar) {
-          
-        connections.push([currStar.x, currStar.y, constellationStars[i].x, constellationStars[i].y]);
-        console.log(connections);
-        console.log("released!");
-
-      }
-    }
-  }
-
-  starSelected = false;
-
-}
-
+*/
 
