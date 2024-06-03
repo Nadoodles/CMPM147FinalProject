@@ -13,12 +13,16 @@ let canvas;
 let canvasContainer;
 var centerHorz, centerVert;
 
-const starRadius = 5;
+const starRadius = 10;
 let backgroundStars = []; // Array to store star positions
 let constellationStars = []; // Array to store consetallion star positions
 let selectedStars = []; // Array to store selected star positions for drawing lines
 let reseedButton;
 let reseedNeeded = true;
+
+let connections = [];
+let currStar;
+let starSelected;
 
 class MyClass {
     constructor(param1, param2) {
@@ -102,13 +106,19 @@ function draw() {
   // Draw lines between selected stars
   stroke(255); // Set stroke color to white
   strokeWeight(2); // Set line thickness
-  for (let i = 0; i < selectedStars.length - 1; i++) {
-    line(selectedStars[i].x, selectedStars[i].y, selectedStars[i + 1].x, selectedStars[i + 1].y);
+  for (let i = 0; i < connections.length; i++) {
+    line(connections[i][0], connections[i][1], connections[i][2], connections[i][3]);
   }
 
   // Draw constellation stars - Jim
   for (let i = 0; i < constellationStars.length; i++) {
     constellationStars[i].show();
+  }
+
+  if (starSelected) {
+
+    line(mouseX, mouseY, currStar.x, currStar.y);
+
   }
 }
 
@@ -140,7 +150,8 @@ class constellationStar{
     // star circle
     ellipse(this.x, this.y, this.size, this.size);
 
-    // star lines
+    // this looks cool but it slows down the code like heyo
+    /*// star lines
     // it's scuffed but basically it increases the line thickeness as it gets closer to the ellipse using lerp
     let prev_x_left = this.x-10;
     let prev_x_right = this.x+10;
@@ -162,7 +173,7 @@ class constellationStar{
       prev_x_right = current_x_right;
       prev_y_up = current_y_up
       prev_y_down = current_y_down
-    }
+    }*/
 
     // glow
     // wack i'll mess around more with it later, or someone else can
@@ -175,19 +186,44 @@ class constellationStar{
 // mousePressed() function is called once after every time a mouse button is pressed
 function mousePressed() {
   // Check if a star was clicked
+
+  starSelected = false;
+
   for (let i = 0; i < constellationStars.length; i++) {
-      let d = dist(mouseX, mouseY, constellationStars[i].x, constellationStars[i].y);
+
+      let d = dist(mouseX, mouseY, constellationStars[i].x, constellationStars[i].y);   // get distance to star
+
       if (d < starRadius) {
-          // Code to check is star has already been selected: 
-          let index = selectedStars.indexOf(constellationStars[i]);
-          if (index > -1) {
-              // Star is already selected, remove it from the array
-              selectedStars.splice(index, 1);
-          } else {
-              selectedStars.push(constellationStars[i]);
-          }
+          currStar = constellationStars[i];
+          starSelected = true;
+          console.log("clicked!");
           break;
       }
   }
 }
+
+function mouseReleased() {
+
+  if (starSelected) {
+
+    console.log("scanning...");
+  
+    for (let i = 0; i < constellationStars.length; i++) {
+
+      let d = dist(mouseX, mouseY, constellationStars[i].x, constellationStars[i].y);   // get distance to star
+
+      if (d < starRadius && constellationStars[i] != currStar) {
+          
+        connections.push([currStar.x, currStar.y, constellationStars[i].x, constellationStars[i].y]);
+        console.log(connections);
+        console.log("released!");
+
+      }
+    }
+  }
+
+  starSelected = false;
+
+}
+
 
