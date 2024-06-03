@@ -28,6 +28,7 @@ let starSelected;
 let fadeOutSpeed = 0.1;
 let sparkSpeed = 0.3;
 let sparkSize = 5;
+let maxSparks = 100;
 
 class MyClass {
     constructor(param1, param2) {
@@ -75,6 +76,8 @@ function setup() {
 function reseedStars() {
   reseedNeeded = true;
   selectedStars = []; // Clear selected stars on reseed
+  connections = [];
+  sparks = [];
 }
 
 // draw() function is called repeatedly, it's the main animation loop
@@ -207,11 +210,16 @@ class constellationStar{
   twinkle(fromStar = null) {
 
     this.resetGlow();
+
     for (let i = 0; i < this.vertices.length; i++) {
 
       if (fromStar != this.vertices[i]) {
 
-        sparks.push(new spark(this, this.vertices[i])); 
+        if (sparks.length <= maxSparks) {
+        
+            sparks.push(new spark(this, this.vertices[i])); 
+
+        }
 
       }
 
