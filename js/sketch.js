@@ -176,10 +176,18 @@ class constellationStar{
 function mousePressed() {
   // Check if a star was clicked
   for (let i = 0; i < constellationStars.length; i++) {
-    let d = dist(mouseX, mouseY, constellationStars[i].x, constellationStars[i].y);
-    if (d < starRadius) {
-      selectedStars.push(constellationStars[i]);
-      break;
-    }
+      let d = dist(mouseX, mouseY, constellationStars[i].x, constellationStars[i].y);
+      if (d < starRadius) {
+          // Code to check is star has already been selected: 
+          let index = selectedStars.indexOf(constellationStars[i]);
+          if (index > -1) {
+              // Star is already selected, remove it from the array
+              selectedStars.splice(index, 1);
+          } else {
+              selectedStars.push(constellationStars[i]);
+          }
+          break;
+      }
   }
 }
+
