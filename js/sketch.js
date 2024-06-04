@@ -280,6 +280,7 @@ class spark {
           constellationStars[i].twinkle(this.fromStar);
           let index = sparks.indexOf(this);
           sparks.splice(index, 1);
+          playSound(dist(this.fromStar.x, this.fromStar.y, this.nextStar.x, this.nextStar.y))
 
         }
 
