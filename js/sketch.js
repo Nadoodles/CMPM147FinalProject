@@ -30,6 +30,9 @@ let sparkSpeed = 0.3;
 let sparkSize = 5;
 let maxSparks = 100;
 
+let audioContext;
+let reverb;
+
 class MyClass {
     constructor(param1, param2) {
         this.property1 = param1;
@@ -46,6 +49,11 @@ function resizeScreen() {
   centerVert = canvasContainer.height() / 2; // Adjusted for drawing logic
   console.log("Resizing...");
   resizeCanvas(canvasContainer.width(), canvasContainer.height());
+}
+
+function preload() {
+  soundFormats('mp3', 'ogg', 'wav');
+  guitarStrum = loadSound('./assets/guitar_strum.wav');
 }
 
 // setup() function is called once when the program starts
@@ -71,6 +79,9 @@ function setup() {
   for (let i = 0; i < 20; i++){
     constellationStars[i] = new constellationStar();
   }
+
+  getAudioContext().suspend(); // Prevent audio from playing on startup
+  reverb = new p5.Reverb();
 }
 
 function reseedStars() {
@@ -281,6 +292,9 @@ class spark {
 }
 
 function mousePressed() {
+  if (getAudioContext().state !== 'running') {
+    getAudioContext().resume();
+  }
 
   starSelected = false;
 
@@ -300,6 +314,23 @@ function mousePressed() {
 
 }
 
+/*
+  rate() edits the pitch of a sound -- 1.0 is original, > 1 players higher pitch < 1 plays lower pitch
+  negative values dont work
+  My brain isnt working to come up with a better way to calculte this val below
+  d is distance between stars, multipy by .01 to scale it down and a negative to make longer dist be lower pitch
+  add 5 to counter the negatives but still sometimes neg so abs at end for the outliers
+  -Jac
+*/
+function playSound(d) {
+  d = abs((d*-.01)+7);
+  console.log(d);
+  reverb.process(guitarStrum, 2, 2);  // 2 seconds reverb time, decay rate of 2%
+  guitarStrum.rate(d);
+  guitarStrum.play();
+}
+
+
 function mouseReleased() {
 
   if (starSelected) {
@@ -307,7 +338,7 @@ function mouseReleased() {
     for (let i = 0; i < constellationStars.length; i++) {
 
       let d = dist(mouseX, mouseY, constellationStars[i].x, constellationStars[i].y);   // get distance to star
-
+      let starDist = dist(currStar.x, currStar.y, constellationStars[i].x, constellationStars[i].y)
       if (d < starRadius) {
         
         if (constellationStars[i] == currStar) {
@@ -321,6 +352,7 @@ function mouseReleased() {
           connections.push([currStar, constellationStars[i]]);
           currStar.vertices.push(constellationStars[i]);
           constellationStars[i].vertices.push(currStar);
+          playSound(starDist);
           starSelected = false;
           return;
 
