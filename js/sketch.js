@@ -272,7 +272,7 @@ class spark {
     for (let i = 0; i < constellationStars.length; i++) {
 
       let d = dist(this.pos.x, this.pos.y, constellationStars[i].x, constellationStars[i].y);   // get distance to star
-
+      playSound(starDist);
       if (d < starRadius) {
         
         if (constellationStars[i] == this.nextStar) {
