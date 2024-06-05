@@ -19,6 +19,7 @@ let constellationStars = []; // Array to store consetallion star positions
 let selectedStars = []; // Array to store selected star positions for drawing lines
 let sparks = [];
 let reseedButton;
+let playAllButton;
 let reseedNeeded = true;
 
 let connections = [];
@@ -49,6 +50,17 @@ function resizeScreen() {
   centerVert = canvasContainer.height() / 2; // Adjusted for drawing logic
   console.log("Resizing...");
   resizeCanvas(canvasContainer.width(), canvasContainer.height());
+}
+
+function playAllStrings() {
+  for (let i = 0; i < connections.length; i++) {
+    let startStar = connections[i][0];
+    let endStar = connections[i][1];
+    let d = dist(startStar.x, startStar.y, endStar.x, endStar.y);
+    setTimeout(() => {
+      playSound(d);
+    }, i * 500); 
+  }
 }
 
 function preload() {
@@ -82,6 +94,9 @@ function setup() {
 
   getAudioContext().suspend(); // Prevent audio from playing on startup
   reverb = new p5.Reverb();
+
+  playAllButton = select('#playAllButton');
+  playAllButton.mousePressed(playAllStrings);
 }
 
 function reseedStars() {
@@ -90,6 +105,7 @@ function reseedStars() {
   connections = [];
   sparks = [];
 }
+
 
 // draw() function is called repeatedly, it's the main animation loop
 function draw() {
@@ -186,10 +202,9 @@ class constellationStar{
 
   constructor(){
 
-    this.x = random(width); // x position
-    this.y = random(height); // y position
-    this.size = random(9, 10) ; // random size for ellipse
-    //this.line_resolution = 40; // resolution for the cross lines
+    this.x = random(width); 
+    this.y = random(height); 
+    this.size = random(9, 10) ;
     this.opacity = 255;
     this.vertices = [];
 
