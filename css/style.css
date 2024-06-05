@@ -8,7 +8,6 @@ canvas {
 
 /* Center the canvas element on the page */
 body {
-<<<<<<< HEAD
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -20,51 +19,31 @@ body {
 }
 
 #canvas-container {
-    width: 100%;
-    height: 600px;
-    background-color: #302244;
-    border: 5px solid transparent;
-    border-image: linear-gradient(to bottom right, #b827fc 0%, #2c90fc 25%, #b8fd33 50%, #fec837 75%, #fd1892 100%);
-    border-image-slice: 1;
-=======
-display: flex;
-flex-direction: column;
-align-items: center;
-justify-content: center;
-min-height: 100vh;
-margin: 0;
-background-image: url("../assets/147title.png");
-background-size: cover;
-}
-
-#canvas-container {
   width: 100%;
   height: 600px;
   background-color: #302244;
   border: 5px solid transparent;
   border-image: linear-gradient(to bottom right, #b827fc 0%, #2c90fc 25%, #b8fd33 50%, #fec837 75%, #fd1892 100%);
   border-image-slice: 1;
->>>>>>> f7bfe9405f2936aaa399d4232292d947a1fee543
 }
 
 .glitch-wrapper {
-display: flex;
-justify-content: center;
-align-items: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .glitch-output {
-width: 500px;
-font-family: fantasy; 
-border: thin solid gray; 
-padding: 1em; 
-margin: 1em; 
-box-shadow: 2px 2px 5px gray; 
-background: #ffe;
+  width: 500px;
+  font-family: fantasy; 
+  border: thin solid gray; 
+  padding: 1em; 
+  margin: 1em; 
+  box-shadow: 2px 2px 5px gray; 
+  background: #ffe;
 }
 
 .glitch-output #box {
-<<<<<<< HEAD
   white-space: pre-wrap;
 }
 
@@ -82,23 +61,4 @@ background: #ffe;
   border: solid seagreen;
   text-align: center;
   border-radius: 12px;
-=======
-white-space: pre-wrap;
-}
-
-#reseedButton {
-margin-top: 180px;
-background-color: #FFBF00;
-border: solid salmon;
-text-align: center;
-border-radius: 12px;
-}
-
-#playAllButton {
-margin-top: 180px;
-background-color: #FFBF00;
-border: solid seagreen;
-text-align: center;
-border-radius: 12px;
->>>>>>> f7bfe9405f2936aaa399d4232292d947a1fee543
 }
