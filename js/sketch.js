@@ -19,6 +19,7 @@ let constellationStars = []; // Array to store consetallion star positions
 let selectedStars = []; // Array to store selected star positions for drawing lines
 let sparks = [];
 let reseedButton;
+let playAllButton;
 let reseedNeeded = true;
 
 let connections = [];
@@ -32,6 +33,8 @@ let maxSparks = 100;
 
 let audioContext;
 let reverb;
+let randomNumberPlanets; 
+let planets = []; 
 
 class MyClass {
     constructor(param1, param2) {
@@ -44,11 +47,36 @@ class MyClass {
     }
 }
 
+class Planet {
+  constructor(size, color, x, y) {
+    this.size = size;
+    this.color = color;
+    this.x = x;
+    this.y = y;
+  }
+
+  show() {
+    fill(this.color);
+    ellipse(this.x, this.y, this.size, this.size);
+  }
+}
+
 function resizeScreen() {
   centerHorz = canvasContainer.width() / 2; // Adjusted for drawing logic
   centerVert = canvasContainer.height() / 2; // Adjusted for drawing logic
   console.log("Resizing...");
   resizeCanvas(canvasContainer.width(), canvasContainer.height());
+}
+
+function playAllStrings() {
+  for (let i = 0; i < connections.length; i++) {
+    let startStar = connections[i][0];
+    let endStar = connections[i][1];
+    let d = dist(startStar.x, startStar.y, endStar.x, endStar.y);
+    setTimeout(() => {
+      playSound(d);
+    }, i * 500); // 500ms delay between each sound
+  }
 }
 
 function preload() {
@@ -82,6 +110,16 @@ function setup() {
 
   getAudioContext().suspend(); // Prevent audio from playing on startup
   reverb = new p5.Reverb();
+
+  playAllButton = select('#playAllButton');
+  playAllButton.mousePressed(playAllStrings);
+
+  // Create planets
+  randomNumberPlanets = Math.floor(random(1, 4));
+  for (let i = 0; i < randomNumberPlanets; i++) {
+    planets.push(new Planet(random(10, 50), color(random(255), random(255), random(255)), random(width), random(height)));
+  }
+  
 }
 
 function reseedStars() {
@@ -89,7 +127,13 @@ function reseedStars() {
   selectedStars = []; // Clear selected stars on reseed
   connections = [];
   sparks = [];
+  planets = [];
+  randomNumberPlanets = Math.floor(random(1, 4));
+  for (let i = 0; i < randomNumberPlanets; i++) {
+    planets.push(new Planet(random(10, 50), color(random(255), random(255), random(255)), random(width), random(height)));
+  }
 }
+
 
 // draw() function is called repeatedly, it's the main animation loop
 function draw() {
@@ -154,8 +198,14 @@ function draw() {
 
   }
 
+  // Draw sparks
   for (let i = 0; i < sparks.length; i++) {
     sparks[i].show();
+  }
+
+  // Draw planets
+  for (let i = 0; i < planets.length; i++) {
+    planets[i].show();
   }
 
 }
@@ -186,10 +236,9 @@ class constellationStar{
 
   constructor(){
 
-    this.x = random(width); // x position
-    this.y = random(height); // y position
-    this.size = random(9, 10) ; // random size for ellipse
-    //this.line_resolution = 40; // resolution for the cross lines
+    this.x = random(width); 
+    this.y = random(height); 
+    this.size = random(9, 10) ;
     this.opacity = 255;
     this.vertices = [];
 
@@ -272,7 +321,7 @@ class spark {
     for (let i = 0; i < constellationStars.length; i++) {
 
       let d = dist(this.pos.x, this.pos.y, constellationStars[i].x, constellationStars[i].y);   // get distance to star
-      playSound(starDist);
+
       if (d < starRadius) {
         
         if (constellationStars[i] == this.nextStar) {
@@ -280,6 +329,7 @@ class spark {
           constellationStars[i].twinkle(this.fromStar);
           let index = sparks.indexOf(this);
           sparks.splice(index, 1);
+          playSound(dist(this.fromStar.x, this.fromStar.y, this.nextStar.x, this.nextStar.y))
 
         }
 
