@@ -33,6 +33,8 @@ let maxSparks = 100;
 
 let audioContext;
 let reverb;
+let randomNumberPlanets; 
+let planets = []; 
 
 class MyClass {
     constructor(param1, param2) {
@@ -43,6 +45,20 @@ class MyClass {
     myMethod() {
         // code to run when method is called
     }
+}
+
+class Planet {
+  constructor(size, color, x, y) {
+    this.size = size;
+    this.color = color;
+    this.x = x;
+    this.y = y;
+  }
+
+  show() {
+    fill(this.color);
+    ellipse(this.x, this.y, this.size, this.size);
+  }
 }
 
 function resizeScreen() {
@@ -59,7 +75,7 @@ function playAllStrings() {
     let d = dist(startStar.x, startStar.y, endStar.x, endStar.y);
     setTimeout(() => {
       playSound(d);
-    }, i * 500); 
+    }, i * 500); // 500ms delay between each sound
   }
 }
 
@@ -97,6 +113,13 @@ function setup() {
 
   playAllButton = select('#playAllButton');
   playAllButton.mousePressed(playAllStrings);
+
+  // Create planets
+  randomNumberPlanets = Math.floor(random(1, 4));
+  for (let i = 0; i < randomNumberPlanets; i++) {
+    planets.push(new Planet(random(10, 50), color(random(255), random(255), random(255)), random(width), random(height)));
+  }
+  
 }
 
 function reseedStars() {
@@ -104,6 +127,11 @@ function reseedStars() {
   selectedStars = []; // Clear selected stars on reseed
   connections = [];
   sparks = [];
+  planets = [];
+  randomNumberPlanets = Math.floor(random(1, 4));
+  for (let i = 0; i < randomNumberPlanets; i++) {
+    planets.push(new Planet(random(10, 50), color(random(255), random(255), random(255)), random(width), random(height)));
+  }
 }
 
 
@@ -170,8 +198,14 @@ function draw() {
 
   }
 
+  // Draw sparks
   for (let i = 0; i < sparks.length; i++) {
     sparks[i].show();
+  }
+
+  // Draw planets
+  for (let i = 0; i < planets.length; i++) {
+    planets[i].show();
   }
 
 }
