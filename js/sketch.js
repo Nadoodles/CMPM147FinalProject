@@ -16,10 +16,12 @@ var centerHorz, centerVert;
 const starRadius = 10;
 let backgroundStars = []; // Array to store star positions
 let constellationStars = []; // Array to store consetallion star positions
+let constellationStarCount;
 let selectedStars = []; // Array to store selected star positions for drawing lines
 let sparks = [];
 let reseedButton;
 let playAllButton;
+let clearStringsButton;
 let reseedNeeded = true;
 
 let connections = [];
@@ -79,6 +81,12 @@ function playAllStrings() {
   }
 }
 
+function clearStrings(){
+  selectedStars = []; 
+  connections = [];
+  sparks = [];
+}
+
 function preload() {
   soundFormats('mp3', 'ogg', 'wav');
   guitarStrum = loadSound('./assets/guitar_strum.wav');
@@ -103,8 +111,9 @@ function setup() {
   reseedButton = select('#reseedButton');
   reseedButton.mousePressed(reseedStars);
 
-  //Jim 
-  for (let i = 0; i < 20; i++){
+  // set up constellation stars
+  constellationStarCount = Math.floor(random(10, 15))
+  for (let i = 0; i < constellationStarCount; i++){
     constellationStars[i] = new constellationStar();
   }
 
@@ -113,6 +122,9 @@ function setup() {
 
   playAllButton = select('#playAllButton');
   playAllButton.mousePressed(playAllStrings);
+
+  clearStringsButton = select('#clearStringsButton');
+  clearStringsButton.mousePressed(clearStrings);
 
   // Create planets
   randomNumberPlanets = Math.floor(random(1, 4));
@@ -146,13 +158,12 @@ function draw() {
     backgroundStars = [];
     constellationStars = [];
 
-    // Generate 10 sufficiently spaced stars
     while (backgroundStars.length < 300) {
       backgroundStars.push(new backgroundStar());
     }
 
     // generate constellation stars
-    while (constellationStars.length < 20){
+    while (constellationStars.length < constellationStarCount){
       constellationStars.push(new constellationStar()); 
     }
 
@@ -236,8 +247,8 @@ class constellationStar{
 
   constructor(){
 
-    this.x = random(width); 
-    this.y = random(height); 
+    this.x = random(10, width-10); 
+    this.y = random(10, height-10); 
     this.size = random(9, 10) ;
     this.opacity = 255;
     this.vertices = [];
