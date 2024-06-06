@@ -85,6 +85,10 @@ function clearStrings(){
   selectedStars = []; 
   connections = [];
   sparks = [];
+  for (let i = 0; i < constellationStars.length; i++) {
+    constellationStars[i].vertices = [];
+  }
+  
 }
 
 function preload() {
