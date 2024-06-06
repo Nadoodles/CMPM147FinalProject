@@ -62,3 +62,11 @@ body {
   text-align: center;
   border-radius: 12px;
 }
+
+#clearStringsButton {
+  margin-top: 180px;
+  background-color: #FFBF00;
+  border: solid rgb(21, 135, 212);
+  text-align: center;
+  border-radius: 12px;
+}
