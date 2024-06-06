@@ -251,12 +251,12 @@ class constellationStar{
 
   constructor(){
 
-    this.x = random(10, width-10); 
-    this.y = random(10, height-10); 
+    this.x = random(20, width-20); 
+    this.y = random(20, height-20); 
     this.size = random(9, 10) ;
     this.opacity = 255;
     this.vertices = [];
-
+    
   }
 
   show(){
