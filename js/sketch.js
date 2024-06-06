@@ -28,6 +28,8 @@ let starSelected;
 
 let fadeOutSpeed = 0.1;
 let sparkSpeed = 0.3;
+let vibrationScale = 0.05;
+let vibrateDrag = 0.05;
 let sparkSize = 5;
 let maxSparks = 100;
 
@@ -171,12 +173,13 @@ function draw() {
   stroke(255); // Set stroke color to white
   strokeWeight(2); // Set line thickness
 
-  for (let i = 0; i < connections.length; i++) {
-    line(connections[i][0].x, connections[i][0].y, connections[i][1].x, connections[i][1].y);
-  }
-
   if (starSelected) {
     line(mouseX, mouseY, currStar.x, currStar.y);
+  }
+
+  // Draw constellation stars - Jim
+  for (let i = 0; i < sparks.length; i++) {
+    sparks[i].show();
   }
 
   // Draw constellation stars - Jim
@@ -282,13 +285,22 @@ class constellationStar{
 
     for (let i = 0; i < this.vertices.length; i++) {
 
-      if (fromStar != this.vertices[i]) {
+      if (fromStar != this.vertices[i].fromStar || this.vertices.length == 1) {
 
-        if (sparks.length <= maxSparks) {
-        
-            sparks.push(new spark(this, this.vertices[i])); 
+        this.vertices[i].pos.x = this.x;
+        this.vertices[i].pos.y = this.y;
+
+        let savedNext = this.vertices[i].nextStar;
+        if (savedNext == this) {
+
+          this.vertices[i].flip();
 
         }
+        
+        this.vertices[i].arrived = false;
+        
+        let starDist = dist(this.vertices[i].fromStar.x, this.vertices[i].nextStar.y, this.vertices[i].nextStar.x, this.vertices[i].nextStar.y);
+        playSound(starDist);
 
       }
 
@@ -303,9 +315,26 @@ class spark {
   constructor(fromStar, nextStar) {
 
     this.pos = createVector(fromStar.x, fromStar.y);
-    console.log(this.pos.x, this.pos.y);
     this.fromStar = fromStar;
     this.nextStar = nextStar;
+    this.arrived = false;
+    this.vibrateSpeed;
+    this.vibrateVelocity;
+    this.vibrateDirection = 1;
+
+    this.vibrate();
+
+    let starDist = dist(this.fromStar.x, this.nextStar.y, this.nextStar.x, this.nextStar.y);
+    playSound(starDist);
+
+  }
+
+  vibrate() {
+
+    let d = dist(this.fromStar.x, this.fromStar.y, this.nextStar.x, this.nextStar.y);   // get distance to star
+    this.vibrateSpeed = d * vibrationScale;
+    this.vibrateVelocity = 0;
+    console.log("VIBRATION: - ", this.vibrateSpeed);
 
   }
 
@@ -313,29 +342,52 @@ class spark {
 
     fill(255);
     ellipse(this.pos.x, this.pos.y, sparkSize, sparkSize);
-    let direction = createVector(this.nextStar.x - this.pos.x, this.nextStar.y - this.pos.y);
-    direction = direction.normalize();
-    this.pos.x = this.pos.x + (direction.x * sparkSpeed * deltaTime);
-    this.pos.y = this.pos.y + (direction.y * sparkSpeed * deltaTime);
 
-    for (let i = 0; i < constellationStars.length; i++) {
+    this.vibrateSpeed = lerp(this.vibrateSpeed, 0, deltaTime * vibrateDrag);
+    this.vibrateSpeed *= -1;
 
-      let d = dist(this.pos.x, this.pos.y, constellationStars[i].x, constellationStars[i].y);   // get distance to star
+    if (!this.arrived) {
 
-      if (d < starRadius) {
+      let direction = createVector(this.nextStar.x - this.pos.x, this.nextStar.y - this.pos.y);
+      direction = direction.normalize();
+      this.pos.x = this.pos.x + (direction.x * sparkSpeed * deltaTime);
+      this.pos.y = this.pos.y + (direction.y * sparkSpeed * deltaTime);
+
+      let stringDirection = createVector(this.nextStar.x - this.fromStar.x, this.nextStar.y - this.fromStar.y);
+      stringDirection = stringDirection.normalize();
+      let perpendicular = createVector(stringDirection.y, -stringDirection.x);
+
+      this.pos.x = this.pos.x + (perpendicular.x * this.vibrateSpeed * deltaTime);
+      this.pos.y = this.pos.y + (perpendicular.y * this.vibrateSpeed * deltaTime);
+
+
+    }
+
+    // Draw lines between selected stars
+    stroke(255); 
+    strokeWeight(2); 
+    line(this.pos.x, this.pos.y, this.nextStar.x, this.nextStar.y);
+    line(this.pos.x, this.pos.y, this.fromStar.x, this.fromStar.y);
+
+    let d = dist(this.pos.x, this.pos.y, this.nextStar.x, this.nextStar.y);   // get distance to star
+
+    if (d < starRadius && !this.arrived) {
         
-        if (constellationStars[i] == this.nextStar) {
-
-          constellationStars[i].twinkle(this.fromStar);
-          let index = sparks.indexOf(this);
-          sparks.splice(index, 1);
-          playSound(dist(this.fromStar.x, this.fromStar.y, this.nextStar.x, this.nextStar.y))
-
-        }
-
-      }
+      this.nextStar.twinkle(this.fromStar);
+      this.pos.x = this.nextStar.x;
+      this.pos.y = this.nextStar.y;
+      this.arrived = true;
 
     }    
+
+  }
+
+  flip() {
+
+    let savedNext = this.nextStar;
+    this.nextStar = this.fromStar;
+    this.fromStar = savedNext;
+    this.arrived = false;
 
   }
 
@@ -374,7 +426,6 @@ function mousePressed() {
 */
 function playSound(d) {
   d = abs((d*-.01)+7);
-  console.log(d);
   reverb.process(guitarStrum, 2, 2);  // 2 seconds reverb time, decay rate of 2%
   guitarStrum.rate(d);
   guitarStrum.play();
@@ -388,22 +439,24 @@ function mouseReleased() {
     for (let i = 0; i < constellationStars.length; i++) {
 
       let d = dist(mouseX, mouseY, constellationStars[i].x, constellationStars[i].y);   // get distance to star
-      let starDist = dist(currStar.x, currStar.y, constellationStars[i].x, constellationStars[i].y)
       if (d < starRadius) {
         
         if (constellationStars[i] == currStar) {
 
           currStar.twinkle();
           starSelected = false;
+
           return;
 
         } else {
 
-          connections.push([currStar, constellationStars[i]]);
-          currStar.vertices.push(constellationStars[i]);
-          constellationStars[i].vertices.push(currStar);
-          playSound(starDist);
+          let newSpark = new spark(currStar, constellationStars[i])
+
+          sparks.push(newSpark); 
           starSelected = false;
+
+          currStar.vertices.push(newSpark);
+          constellationStars[i].vertices.push(newSpark);
           return;
 
         }
