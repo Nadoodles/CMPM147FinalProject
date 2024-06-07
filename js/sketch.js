@@ -301,7 +301,7 @@ class constellationStar{
 
     for (let i = 0; i < this.vertices.length; i++) {
 
-      if (fromStar != this.vertices[i].fromStar || this.vertices.length == 1) {
+      if (fromStar != this.vertices[i].fromStar) {
 
         this.vertices[i].pos.x = this.x;
         this.vertices[i].pos.y = this.y;
@@ -320,7 +320,7 @@ class constellationStar{
 
         this.vertices[i].vibrate();
         
-        let starDist = dist(this.vertices[i].fromStar.x, this.vertices[i].nextStar.y, this.vertices[i].nextStar.x, this.vertices[i].nextStar.y);
+        let starDist = dist(this.vertices[i].fromStar.x, this.vertices[i].fromStar.y, this.vertices[i].nextStar.x, this.vertices[i].nextStar.y);
         playSound(starDist);
 
       }
@@ -346,6 +346,8 @@ class spark {
     this.perpendicular = createVector(stringDirection.y, -stringDirection.x);
 
     this.vibrate();
+    let starDist = dist(this.fromStar.x, this.fromStar.y, this.nextStar.x, this.nextStar.y);
+    playSound(starDist);
 
   }
 
