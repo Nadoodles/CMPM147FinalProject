@@ -30,8 +30,9 @@ let starSelected;
 
 let fadeOutSpeed = 0.1;
 let sparkSpeed = 0.3;
-let vibrationScale = 0.05;
-let vibrateDrag = 0.05;
+let vibrationScale = 0.04;
+let vibrateDrag = 0.075;
+let sparkCenterSpeed = 0.3;
 let sparkSize = 5;
 let maxSparks = 100;
 
@@ -305,6 +306,9 @@ class constellationStar{
         this.vertices[i].pos.x = this.x;
         this.vertices[i].pos.y = this.y;
 
+        this.vertices[i].center.x = this.x;
+        this.vertices[i].center.y = this.y;
+
         let savedNext = this.vertices[i].nextStar;
         if (savedNext == this) {
 
@@ -313,6 +317,8 @@ class constellationStar{
         }
         
         this.vertices[i].arrived = false;
+
+        this.vertices[i].vibrate();
         
         let starDist = dist(this.vertices[i].fromStar.x, this.vertices[i].nextStar.y, this.vertices[i].nextStar.x, this.vertices[i].nextStar.y);
         playSound(starDist);
@@ -326,87 +332,68 @@ class constellationStar{
 }
 
 class spark {
-
   constructor(fromStar, nextStar) {
-
     this.pos = createVector(fromStar.x, fromStar.y);
     this.fromStar = fromStar;
     this.nextStar = nextStar;
     this.arrived = false;
-    this.vibrateSpeed;
-    this.vibrateVelocity;
-    this.vibrateDirection = 1;
+    this.vibrateSpeed = 0;
+    this.vibrateOffset = 0;
+    this.center = createVector(fromStar.x, fromStar.y);
+
+    // calculate dir and perp
+    let stringDirection = createVector(this.nextStar.x - this.fromStar.x, this.nextStar.y - this.fromStar.y).normalize();
+    this.perpendicular = createVector(stringDirection.y, -stringDirection.x);
 
     this.vibrate();
-
-    let starDist = dist(this.fromStar.x, this.nextStar.y, this.nextStar.x, this.nextStar.y);
-    playSound(starDist);
 
   }
 
   vibrate() {
-
-    let d = dist(this.fromStar.x, this.fromStar.y, this.nextStar.x, this.nextStar.y);   // get distance to star
+    let d = dist(this.fromStar.x, this.fromStar.y, this.nextStar.x, this.nextStar.y);
     this.vibrateSpeed = d * vibrationScale;
-    this.vibrateVelocity = 0;
-    console.log("VIBRATION: - ", this.vibrateSpeed);
+    this.vibrateOffset = 0;
 
   }
 
   show() {
-
     fill(255);
     ellipse(this.pos.x, this.pos.y, sparkSize, sparkSize);
 
-    this.vibrateSpeed = lerp(this.vibrateSpeed, 0, deltaTime * vibrateDrag);
-    this.vibrateSpeed *= -1;
-
     if (!this.arrived) {
+      let direction = createVector(this.nextStar.x - this.pos.x, this.nextStar.y - this.pos.y).normalize();
+      this.pos.add(p5.Vector.mult(direction, sparkSpeed * deltaTime));
 
-      let direction = createVector(this.nextStar.x - this.pos.x, this.nextStar.y - this.pos.y);
-      direction = direction.normalize();
-      this.pos.x = this.pos.x + (direction.x * sparkSpeed * deltaTime);
-      this.pos.y = this.pos.y + (direction.y * sparkSpeed * deltaTime);
+      // oscillation
+      this.vibrateOffset += deltaTime * vibrateDrag;
+      let oscillation = sin(this.vibrateOffset) * this.vibrateSpeed;
+      this.vibrateSpeed = lerp(this.vibrateSpeed, 0, vibrateDrag);
 
-      let stringDirection = createVector(this.nextStar.x - this.fromStar.x, this.nextStar.y - this.fromStar.y);
-      stringDirection = stringDirection.normalize();
-      let perpendicular = createVector(stringDirection.y, -stringDirection.x);
+      this.pos.add(p5.Vector.mult(this.perpendicular, oscillation));
 
-      this.pos.x = this.pos.x + (perpendicular.x * this.vibrateSpeed * deltaTime);
-      this.pos.y = this.pos.y + (perpendicular.y * this.vibrateSpeed * deltaTime);
-
-
+      let d = dist(this.pos.x, this.pos.y, this.nextStar.x, this.nextStar.y);
+      if (d < starRadius) {
+        this.nextStar.twinkle(this.fromStar);
+        this.pos.set(this.nextStar.x, this.nextStar.y);
+        this.arrived = true;
+      }
     }
 
     // Draw lines between selected stars
-    stroke(255); 
-    strokeWeight(2); 
+    stroke(255);
+    strokeWeight(2);
     line(this.pos.x, this.pos.y, this.nextStar.x, this.nextStar.y);
     line(this.pos.x, this.pos.y, this.fromStar.x, this.fromStar.y);
-
-    let d = dist(this.pos.x, this.pos.y, this.nextStar.x, this.nextStar.y);   // get distance to star
-
-    if (d < starRadius && !this.arrived) {
-        
-      this.nextStar.twinkle(this.fromStar);
-      this.pos.x = this.nextStar.x;
-      this.pos.y = this.nextStar.y;
-      this.arrived = true;
-
-    }    
-
   }
 
   flip() {
-
     let savedNext = this.nextStar;
     this.nextStar = this.fromStar;
     this.fromStar = savedNext;
     this.arrived = false;
-
   }
-
 }
+
 
 function mousePressed() {
   if (getAudioContext().state !== 'running') {
