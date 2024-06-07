@@ -423,13 +423,10 @@ function mousePressed() {
 /*
   rate() edits the pitch of a sound -- 1.0 is original, > 1 players higher pitch < 1 plays lower pitch
   negative values dont work
-  My brain isnt working to come up with a better way to calculte this val below
-  d is distance between stars, multipy by .01 to scale it down and a negative to make longer dist be lower pitch
-  add 5 to counter the negatives but still sometimes neg so abs at end for the outliers
   -Jac
 */
 function playSound(d) {
-  d = abs((d*-.01)+7);
+  d = (1/d) * 200;
   reverb.process(guitarStrum, 2, 2);  // 2 seconds reverb time, decay rate of 2%
   guitarStrum.rate(d);
   guitarStrum.play();
