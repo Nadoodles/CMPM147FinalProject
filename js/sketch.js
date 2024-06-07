@@ -81,8 +81,11 @@ function playAllStrings() {
     setTimeout(() => {
       playSound(d);
     }, i * 500); // 500ms delay between each sound
+
   }
+
 }
+
 
 function clearStrings(){
   selectedStars = []; 
@@ -426,7 +429,7 @@ function mousePressed() {
   -Jac
 */
 function playSound(d) {
-  d = (1/d) * 200;
+  d = (1 / d) * 200;
   reverb.process(guitarStrum, 2, 2);  // 2 seconds reverb time, decay rate of 2%
   guitarStrum.rate(d);
   guitarStrum.play();
@@ -434,42 +437,30 @@ function playSound(d) {
 
 
 function mouseReleased() {
-
   if (starSelected) {
-  
     for (let i = 0; i < constellationStars.length; i++) {
-
       let d = dist(mouseX, mouseY, constellationStars[i].x, constellationStars[i].y);   // get distance to star
       if (d < starRadius) {
-        
         if (constellationStars[i] == currStar) {
-
           currStar.twinkle();
           starSelected = false;
-
           return;
-
         } else {
-
-          let newSpark = new spark(currStar, constellationStars[i])
-
+          let newSpark = new spark(currStar, constellationStars[i]);
           sparks.push(newSpark); 
           starSelected = false;
-
           currStar.vertices.push(newSpark);
           constellationStars[i].vertices.push(newSpark);
+
+          // Add the connection to the connections array
+          connections.push([currStar, constellationStars[i]]);
           return;
-
         }
-
       }
-
     }
-
   }
-
   starSelected = false;
-
 }
+
 
 
