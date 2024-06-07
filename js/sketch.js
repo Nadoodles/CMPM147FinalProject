@@ -100,6 +100,7 @@ function clearStrings(){
 function preload() {
   soundFormats('mp3', 'ogg', 'wav');
   guitarStrum = loadSound('./assets/guitar_strum.wav');
+  guitarPluck = loadSound('./assets/pluck.wav')
 }
 
 // setup() function is called once when the program starts
@@ -430,9 +431,9 @@ function mousePressed() {
 */
 function playSound(d) {
   d = (1 / d) * 200;
-  reverb.process(guitarStrum, 2, 2);  // 2 seconds reverb time, decay rate of 2%
-  guitarStrum.rate(d);
-  guitarStrum.play();
+  reverb.process(guitarPluck, 2, 2);  // 2 seconds reverb time, decay rate of 2%
+  guitarPluck.rate(d);
+  guitarPluck.play();
 }
 
 
