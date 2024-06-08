@@ -412,7 +412,19 @@ class spark {
   }
 }
 
-
+// helper function to check if the mouse is near a connection line
+function isMouseOnLine(x1, y1, x2, y2, mx, my, tolerance = 5, edgeTolerance = 10) {
+    let d1 = dist(mx, my, x1, y1);
+    let d2 = dist(mx, my, x2, y2);
+    let lineLen = dist(x1, y1, x2, y2);
+  
+    // Check if the mouse is too close to the edges of the line
+    if (d1 < edgeTolerance || d2 < edgeTolerance) {
+      return false;
+    }
+  
+    return (d1 + d2 >= lineLen - tolerance && d1 + d2 <= lineLen + tolerance);
+}
 
 function mousePressed() {
   if (getAudioContext().state !== 'running') {
@@ -435,6 +447,26 @@ function mousePressed() {
         currentPlanet = planets[i];
         planetSelected = true;
       }
+
+      return;
+    }
+  }
+
+  // Check if a line was clicked (with help from chatgpt)
+  for (let i = 0; i < connections.length; i++) {
+    let startStar = connections[i][0];
+    let endStar = connections[i][1];
+
+    if (isMouseOnLine(startStar.x, startStar.y, endStar.x, endStar.y, mouseX, mouseY)) {
+      // remove the connection
+      connections.splice(i, 1);
+
+      // remove the corresponding sparks
+      sparks = sparks.filter(s => !(s.fromStar === startStar && s.nextStar === endStar) && !(s.fromStar === endStar && s.nextStar === startStar));
+
+      // remove the connection from the stars' vertices
+      startStar.vertices = startStar.vertices.filter(v => v.nextStar !== endStar);
+      endStar.vertices = endStar.vertices.filter(v => v.nextStar !== startStar);
 
       return;
     }
