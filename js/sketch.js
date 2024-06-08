@@ -99,8 +99,9 @@ function clearStrings(){
 
 function preload() {
   soundFormats('mp3', 'ogg', 'wav');
-  guitarStrum = loadSound('./assets/guitar_strum.wav');
-  guitarPluck = loadSound('./assets/pluck.wav')
+ // guitarStrum = loadSound('./assets/guitar_strum.wav');
+  guitarPluck = loadSound('./assets/pluck.wav');
+  drumKick = loadSound('./assets/808_Kick.wav');
 }
 
 // setup() function is called once when the program starts
