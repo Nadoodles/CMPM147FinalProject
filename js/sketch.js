@@ -29,6 +29,7 @@ let currStar;
 let starSelected;
 
 let planetSelected; 
+let currentPlanet = [];
 
 let fadeOutSpeed = 0.1;
 let sparkSpeed = 0.3;
@@ -153,6 +154,10 @@ function setup() {
 }
 
 function reseedStars() {
+  // Stop any playing drum sound when reseeding
+  if (window.drumInterval) {
+    clearInterval(window.drumInterval);
+  }
   reseedNeeded = true;
   selectedStars = []; // Clear selected stars on reseed
   connections = [];
@@ -419,8 +424,18 @@ function mousePressed() {
 
   for (let i = 0; i < planets.length; i++) {
     if (planets[i].isClicked(mouseX, mouseY)) {
-      playDrum();
-      planetSelected = true;
+      if (currentPlanet === planets[i]) {
+        // If the same planet is clicked again, stop the drum and clear currentPlanet
+        clearInterval(window.drumInterval);
+        currentPlanet = null;
+        planetSelected = false;
+      } else {
+        // Play drum sound and set currentPlanet
+        playDrum(planets[i].size);
+        currentPlanet = planets[i];
+        planetSelected = true;
+      }
+
       return;
     }
   }
@@ -448,8 +463,20 @@ function playSound(d) {
   guitarPluck.play();
 }
 
-function playDrum() {
-  drumKick.play();
+function playDrum(size) {
+  size = (1 / size) * 100;
+  drumKick.rate(size);
+  //drumKick.play();
+  if (window.drumInterval) {
+    clearInterval(window.drumInterval);
+  }
+
+  let intervalDuration = 1500 / size; // Play 'rate' times per second
+
+  // Set an interval to play the drum sound repeatedly
+  window.drumInterval = setInterval(function() {
+    drumKick.play();
+  }, intervalDuration);
 }
 
 
