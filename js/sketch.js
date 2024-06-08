@@ -28,6 +28,8 @@ let connections = [];
 let currStar;
 let starSelected;
 
+let planetSelected; 
+
 let fadeOutSpeed = 0.1;
 let sparkSpeed = 0.3;
 let vibrationScale = 0.04;
@@ -59,10 +61,14 @@ class Planet {
     this.x = x;
     this.y = y;
   }
-
   show() {
     fill(this.color);
     ellipse(this.x, this.y, this.size, this.size);
+  }
+
+  isClicked(mx, my) {
+    let d = dist(mx, my, this.x, this.y);
+    return d < this.size / 2;
   }
 }
 
@@ -141,7 +147,7 @@ function setup() {
   // Create planets
   randomNumberPlanets = Math.floor(random(1, 4));
   for (let i = 0; i < randomNumberPlanets; i++) {
-    planets.push(new Planet(random(10, 50), color(random(255), random(255), random(255)), random(width), random(height)));
+    planets.push(new Planet(random(30, 90), color(random(255), random(255), random(255)), random(width), random(height)));
   }
   
 }
@@ -402,27 +408,32 @@ class spark {
 }
 
 
+
 function mousePressed() {
   if (getAudioContext().state !== 'running') {
     getAudioContext().resume();
   }
 
   starSelected = false;
+  planetSelected = false;
+
+  for (let i = 0; i < planets.length; i++) {
+    if (planets[i].isClicked(mouseX, mouseY)) {
+      playDrum();
+      planetSelected = true;
+      return;
+    }
+  }
 
   for (let i = 0; i < constellationStars.length; i++) {
-
     let d = dist(mouseX, mouseY, constellationStars[i].x, constellationStars[i].y);   // get distance to star
 
     if (d < starRadius) {
-
       currStar = constellationStars[i];
       starSelected = true;
       break;
-
     }
-
   }
-
 }
 
 /*
@@ -435,6 +446,10 @@ function playSound(d) {
   reverb.process(guitarPluck, 2, 2);  // 2 seconds reverb time, decay rate of 2%
   guitarPluck.rate(d);
   guitarPluck.play();
+}
+
+function playDrum() {
+  drumKick.play();
 }
 
 
@@ -462,6 +477,8 @@ function mouseReleased() {
     }
   }
   starSelected = false;
+
+
 }
 
 
