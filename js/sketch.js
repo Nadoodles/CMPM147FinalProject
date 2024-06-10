@@ -170,7 +170,6 @@ function setup() {
   let label = createP();
   label.html("World Key: ");
   label.parent("canvas-container");
-  //label.color("white");
   input = createInput("727");
   input.parent(label);
   input.input(() => {
