@@ -173,7 +173,7 @@ function setup() {
   label.style('color', 'white');
   label.position('center');
   label.style('border', '5px #FFBF00 solid');
-  label.style('border-radius', '100px');
+  label.style('border-radius', '50px');
   input = createInput("727");
   input.parent(label);
   input.input(() => {
