@@ -171,6 +171,7 @@ function setup() {
   label.html("World Key: ");
   label.parent("canvas-container");
   label.style('color', 'white');
+  label.style('border', '5px #FFBF00 solid');
   input = createInput("727");
   input.parent(label);
   input.input(() => {
