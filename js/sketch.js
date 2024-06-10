@@ -172,6 +172,7 @@ function setup() {
   label.parent("canvas-container");
   label.style('color', 'white');
   label.style('border', '5px #FFBF00 solid');
+  label.style('border-radius', '100px');
   input = createInput("727");
   input.parent(label);
   input.input(() => {
