@@ -1,5 +1,3 @@
-/* style.css */
-
 /* Set the canvas element to be the full size of the container */
 canvas {
   width: 100%;
@@ -47,26 +45,33 @@ body {
   white-space: pre-wrap;
 }
 
-#reseedButton {
-  margin-top: 180px;
+.button-container {
+  display: flex;
+  justify-content: center;
+  gap: 10px; /* space between buttons */
+  margin: 20px 0; /* margin around the container */
+}
+
+#reseedButton, #playAllButton, #clearStringsButton, #randomStringsButton{
   background-color: #FFBF00;
-  border: solid salmon;
+  border: solid 2px;
   text-align: center;
   border-radius: 12px;
+  padding: 10px 20px;
+}
+
+#reseedButton {
+  border-color: salmon;
 }
 
 #playAllButton {
-  margin-top: 180px;
-  background-color: #FFBF00;
-  border: solid seagreen;
-  text-align: center;
-  border-radius: 12px;
+  border-color: seagreen;
 }
 
 #clearStringsButton {
-  margin-top: 180px;
-  background-color: #FFBF00;
-  border: solid rgb(21, 135, 212);
-  text-align: center;
-  border-radius: 12px;
+  border-color: rgb(21, 135, 212);
+}
+
+#randomStringsButton {
+  border-color: rgb(212, 21, 21);
 }

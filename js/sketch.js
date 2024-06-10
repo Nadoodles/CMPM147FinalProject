@@ -80,6 +80,29 @@ function playAllStrings() {
 
 }
 
+function randomStrings() {
+  clearStrings();
+
+  let numStrings = Math.floor(random(3, 6)); 
+
+  for (let i = 0; i < numStrings; i++) {
+    let startStar = constellationStars[Math.floor(random(constellationStars.length))];
+    let endStar;
+    
+    do {
+      endStar = constellationStars[Math.floor(random(constellationStars.length))];
+    } while (startStar === endStar); 
+
+    let newSpark = new spark(startStar, endStar);
+    sparks.push(newSpark);
+    startStar.vertices.push(newSpark);
+    endStar.vertices.push(newSpark);
+
+    connections.push([startStar, endStar]);
+  }
+}
+
+
 
 function clearStrings(){
   selectedStars = []; 
@@ -134,6 +157,9 @@ function setup() {
   clearStringsButton = select('#clearStringsButton');
   clearStringsButton.mousePressed(clearStrings);
 
+  randomStringsButton = select('#randomStringsButton');
+  randomStringsButton.mousePressed(randomStrings);
+
   // Create planets
   randomNumberPlanets = Math.floor(random(1, 4));
   for (let i = 0; i < randomNumberPlanets; i++) {
@@ -151,6 +177,8 @@ function setup() {
     window.changeWorldKey(input.value())
     reseedNeeded = true;
     clearStrings();
+
+  
   });
 
   window.changeWorldKey(input.value())
