@@ -171,6 +171,7 @@ function setup() {
   label.html("World Key: ");
   label.parent("canvas-container");
   label.style('color', 'white');
+  label.position('center');
   label.style('border', '5px #FFBF00 solid');
   label.style('border-radius', '100px');
   input = createInput("727");
